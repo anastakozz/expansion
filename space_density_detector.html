@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space Density Detector</title>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+    #density-score {
+      font-size: 24px;
+      margin: 10px;
+      color: #333;
+    }
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <h1>Space Density Detector</h1>
+  <p id="density-score">Density Score: Calculating...</p>
+  <script>
+    let capture;
+    let densityScore = 0;
+
+    function setup() {
+      createCanvas(windowWidth * 0.9, windowHeight * 0.6);
+      capture = createCapture(VIDEO);
+      capture.size(width, height);
+      capture.hide();
+    }
+
+    function draw() {
+      background(255);
+      image(capture, 0, 0, width, height);
+      let edgeDensity = computeEdgeDensity();
+      densityScore = int(edgeDensity * 100);
+      document.getElementById("density-score").innerText = `Density Score: ${densityScore}`;
+    }
+
+    function computeEdgeDensity() {
+      loadPixels();
+      let edgeCount = 0;
+      let totalPixels = pixels.length / 4; // RGBA channels
+
+      for (let i = 0; i < pixels.length; i += 4) {
+        let avgBrightness = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+        if (avgBrightness < 50) { // Threshold for detecting edges
+          edgeCount++;
+        }
+      }
+      return edgeCount / totalPixels;
+    }
+  </script>
+</body>
+</html>
